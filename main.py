@@ -1,9 +1,15 @@
-﻿from telegram import Update
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+from telegram import Update
+from telegram.ext import (
+    Application,
+    CommandHandler,
+    MessageHandler,
+    ContextTypes,
+    filters,
+)
+
 from rahavard import get_price
 from config import BOT_TOKEN
 
-# شناسه نمادها
 SYMBOLS = {
     "شسپا": 478,
     "شپنا": 484,
@@ -18,10 +24,7 @@ SYMBOLS = {
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "سلام 👋\n"
-        "نماد را ارسال کنید.\n"
-        "مثال:\n"
-        "شسپا"
+        "سلام 👋\n\nنماد را ارسال کنید.\nمثال:\nشسپا"
     )
 
 async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -34,24 +37,23 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     try:
         data = get_price(SYMBOLS[text])
 
-        msg = f"""
-📊 {text}
+        msg = (
+            f"📊 {text}\n\n"
+            f"💰 آخرین قیمت: {data['last']}\n"
+            f"📌 قیمت پایانی: {data['close']}\n"
+            f"📈 تغییر: {data['change']}\n"
+            f"📊 درصد: {data['percent']}%"
+        )
 
-💰 آخرین قیمت: {data['last']}
-📌 قیمت پایانی: {data['close']}
-📈 تغییر: {data['change']}
-📊 درصد: {data['percent']}%
-"""
         await update.message.reply_text(msg)
 
     except Exception as e:
         await update.message.reply_text(str(e))
 
-app = ApplicationBuilder().token(BOT_TOKEN).build()
+
+app = Application.builder().token(BOT_TOKEN).build()
 
 app.add_handler(CommandHandler("start", start))
-
-from telegram.ext import MessageHandler, filters
 app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message))
 
 print("Bot Started...")
