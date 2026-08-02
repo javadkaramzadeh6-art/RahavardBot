@@ -50,11 +50,18 @@ async def message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         await update.message.reply_text(str(e))
 
+def main():
+    # ساخت اپلیکیشن با توکن
+    app = Application.builder().token(BOT_TOKEN).build()
 
-app = Application.builder().token(BOT_TOKEN).build()
+    # ثبت هندلرها
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message))
 
-app.add_handler(CommandHandler("start", start))
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message))
+    print("Bot Started...")
+    
+    # اجرای ربات با متد استاندارد نسخه جدید
+    app.run_polling()
 
-print("Bot Started...")
-app.run_polling()
+if __name__ == "__main__":
+    main()
