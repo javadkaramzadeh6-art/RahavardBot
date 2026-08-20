@@ -1,10 +1,8 @@
-from fastapi import FastAPI
+from http.server import BaseHTTPRequestHandler
 
-app = FastAPI()
-
-@app.get("/api")
-def home():
-    return {
-        "status": "ok",
-        "message": "Rahavard Bot API is online!"
-    }
+class handler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.send_header("Content-type", "text/plain; charset=utf-8")
+        self.end_headers()
+        self.wfile.write(b"Rahavard Bot is online!")
